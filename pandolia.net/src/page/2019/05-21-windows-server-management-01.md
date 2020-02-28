@@ -1,6 +1,6 @@
 ---
 title: windows server 管理（ 1 ）
-image: 432.jpg
+image: 927.jpg
 category: Devops
 ---
 

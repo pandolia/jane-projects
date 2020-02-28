@@ -1,6 +1,6 @@
 ---
 title: EasyService： Windows 系统服务注册及管理工具
-image: 927.jpg
+image: 432.jpg
 category: Devops
 ---
 如果你的 Windows 程序需要在后台长期运行，而且你希望它在开机后用户登录之前就自动运行、且在用户注销之后也不停止，那么你需要将程序注册为一个系统服务。

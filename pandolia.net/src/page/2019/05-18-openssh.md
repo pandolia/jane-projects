@@ -9,6 +9,9 @@ category: Devops
 （1） 检查一下服务器的 ssh 配置文件 /etc/ssh/sshd_config （ Windows OpenSSH 下，配置文件在 C:\ProgramData\ssh\sshd_config ）。
 
 ```
+# 允许 root 用户登录
+PermitRootLogin yes
+
 # 启用 RSA 公钥登录
 RSAAuthentication yes
 PubkeyAuthentication yes
@@ -25,11 +28,19 @@ ClientAliveInterval 30
 ClientAliveCountMax 3
 ```
 
-对于 Windows OpenSSH ，需要注意要把配置文件中的下面两行注释掉：
+Windows OpenSSH 下，需要注意要把配置文件中的下面两行注释掉：
 
 ```
 # Match Group administrators
 #       AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
+```
+
+Linux 系统下，需要修改相应的文件及目录的权限：
+
+```
+chmod 700 /home/username
+chmod 700 ~/.ssh/
+chmod 600 ~/.ssh/authorized_keys
 ```
 
 修改配置后重启 sshd 服务。
@@ -88,19 +99,13 @@ ssh -fNR 8000:192.168.1.125:80 administrator@45.32.127.32
 
 这条命令在本地（A）和 远程服务器（B）之间建立了一条反向隧道，具体过程为：
 
-```
-1. 本地启动 ssh 进程；
+* （1） 本地启动 ssh 进程；
 
-2. ssh 进程登录远程服务器，命令远程服务器 sshd 进程开始监听 8000 端口；
+* （2） ssh 进程登录远程服务器，命令远程服务器 sshd 进程开始监听 8000 端口；
 
-3. sshd 在 8000 端口上接收到的任何连接请求和数据都会转发到本地的 ssh 进程，ssh 进程再
-    
-   将连接请求和数据转发到 192.168.1.125:80 端口，并将响应数据原路返回。
-```
+* （3） sshd 在 8000 端口上接收到的任何连接请求和数据都会转发到本地的 ssh 进程，ssh 进程再将连接请求和数据转发到 192.168.1.125:80 端口，并将响应数据原路返回。
 
-参数 R 表示建立反向隧道， N 表示不在远程服务器上执行命令， f 表示在后台运行 ssh （即便关闭终端，ssh 进程也不会被关闭）。
-
--R 参数格式：
+参数 R 表示建立反向隧道， N 表示不在远程服务器上执行命令， f 表示在后台运行 ssh （即便关闭终端，ssh 进程也不会被关闭）。-R 参数格式：
 
 ```sh
 -R 远程监听网卡地址:端口:本地转发地址:端口
@@ -122,13 +127,9 @@ ssh -fNL 80:45.32.127.32:8000 administrator@45.32.127.32
 
 这条命令在本地（C）和 远程服务器（B）之间建立了一条正向隧道，具体过程为：
 
-```
-1. 本地启动 ssh 进程，登录远程服务器，
+* （1） 本地启动 ssh 进程，登录远程服务器，
 
-2. 本地 ssh 进程开始监听 80 端口，任何发向此端口的连接请求都由 ssh 进程会转发到
-
-   远程服务器的 sshd 进程，sshd 进程再将连接请求转发到 45.32.127.32:8000 端口。
-```
+* （2） 本地 ssh 进程开始监听 80 端口，任何发向此端口的连接请求都由 ssh 进程会转发到远程服务器的 sshd 进程，sshd 进程再将连接请求转发到 45.32.127.32:8000 端口。
 
 这里同样可以将 45.32.127.32:8000 改成其他地址和端口（只要 B 可以访问到）。
 
